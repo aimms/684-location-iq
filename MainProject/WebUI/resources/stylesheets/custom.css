@@ -1,0 +1,34 @@
+/*Centering cells*/
+.tag-table .cell.flag-string .cell-wrapper,
+.tag-table .cell.flag-number input,
+.tag-table .cell.flag-string input{
+    text-align: center;
+}
+
+.tag-scalar .kpi .value.flag-readOnly {
+    color: var(--color_text_default);
+}
+
+.tag-scalar table tr {
+    border-bottom: 1px solid var(--gray); 
+}
+
+.workflow-panel--v2:not(:empty) {
+    border-right: 2px solid var(--grayDarker);
+}
+
+.aimms-widget.tag-footer {
+    border-top: 1px solid var(--grayDarker) !important; 
+    box-shadow: none !important;
+}
+
+.veil-msg {
+    background-color: var(--grayLighter);
+}
+
+.tabbed-pages__tab-bar-tab-link, 
+.tabbed-pages__tab-bar-tab-link:active, 
+.tabbed-pages__tab-bar-tab-link:focus, 
+.tabbed-pages__tab-bar-tab-link:hover {
+    color: var(--color_text_default);
+}

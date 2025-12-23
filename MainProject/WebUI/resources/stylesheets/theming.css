@@ -1,0 +1,70 @@
+:root {
+/*---------------------------------------------------------------------
+        COLORS
+----------------------------------------------------------------------*/
+  --primaryDark: #000081;
+  --primary: #004BFF;
+  --gray: #E8EAEC;
+  --grayDarker: #d6d9da;
+
+/*---------------------------------------------------------------------
+        HEADER
+----------------------------------------------------------------------*/  
+  --bg_app-logo: 15px 50% / 30px no-repeat url(/app-resources/resources/images/aimms_icon.png); /*app logo*/
+  --spacing_app-logo_width: 45px;
+  --color_border_app-header-divider: var(--primaryDark); /*line color after header*/
+  --color_bg_app-header: var(--gray); /*header background color*/ 
+  --color_bg_app-canvas: url(/app-resources/resources/images/LeftBackground.png) var(--gray) no-repeat right/contain; /*background color*/
+
+/*---------------------------------------------------------------------
+        WORKFLOW
+----------------------------------------------------------------------*/
+--color_bg_workflow : var(--gray); /*workflow background color*/
+--color_bg_workflow_current : var(--primaryDark); /*workflow active step color*/
+--color_border-divider_light: 0px var(--primaryDark); /*divider line color*/
+--color_workflow-icon-border: var(--grayDarker); /*workflow icon border color*/
+--color_bg_workflow-icon: var(--grayDarker); /*workflow icon background color*/
+--color_workflow_active: var(--color_text_default);
+--color_workflow-item-divider: var(--grayDarker); /*color between steps*/
+
+/*---------------------------------------------------------------------
+        WIDGET
+----------------------------------------------------------------------*/ 
+  --color_bg_widget-header: white; /*widget header background color*/
+  --border_widget-header: 1px solid var(--gray); /*line color after widget header*/
+
+/*---------------------------------------------------------------------
+        FONT COLOR
+----------------------------------------------------------------------*/ 
+  --color_text_edit-select-link: var(--primaryDark);
+  --color_text_edit-select-link_hover: var(--primary);
+  --color_text_widget-header: var(--color_text_default); 
+  --color_text_default: #080e1d;
+  --color_text_workflow_header: var(--color_text_default);
+  --color_text_high-contrast: var(--color_text_default);
+
+/*---------------------------------------------------------------------
+        BUTTONS
+----------------------------------------------------------------------*/
+  --color_bg_button_primary: var(--primaryDark);
+  --color_bg_button_primary_hover: var(--primaryLight);
+  --border_button_secondary_hover: 1px solid var(--primaryDark);
+  --color_text_button_secondary_hover: white;
+  --color_bg_button_secondary_hover: var(--primaryDark);
+  --color_text_button_secondary: var(--primaryDark);
+  --border_button_secondary: 1px solid var(--primaryDark);  
+  --color_bg_icon_widget-header-actions_hover: var(--color_text_default);
+
+/*---------------------------------------------------------------------
+        SIDE PANEL
+----------------------------------------------------------------------*/
+--color_bg_sidepanel-tab_active: var(--primaryDark); /*side panel active tab background color*/
+
+/*---------------------------------------------------------------------
+        FOOTER
+----------------------------------------------------------------------*/
+--color_bg_app-footer: var(--gray); /*footer background color*/
+
+}
+
+
