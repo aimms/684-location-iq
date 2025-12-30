@@ -4,11 +4,22 @@ LibraryModule LocationIQ {
 	Prefix: liq;
 	Interface: Public_Section;
 	Section Public_Section {
-		Procedure pr_GeoFindCoordinates {
-			Arguments: (address,latitude,longitude);
+		Procedure pr_setAccessToken {
+			Arguments: (sp_newAccessToken);
 			Body: {
+				sp_accessToken := sp_newAccessToken ;
+			}
+			Comment: "Set the access token to be used by pr_GeoFindCoordinates.";
+			StringParameter sp_newAccessToken {
+				Property: Input;
+			}
+		}
+		Procedure pr_GeoFindCoordinates {
+			Arguments: (address,latitude,longitude,email,url);
+			Body: {
+				
 				block
-					p_returnCode := 1;
+					_p_returnCode := 1;
 					CurrentErrorMessage := "" ;
 					pr_workGeoFindCoordinates(address,latitude,longitude);
 				onerror _ep_err do
@@ -17,25 +28,40 @@ LibraryModule LocationIQ {
 					else
 						CurrentErrorMessage := errh::Message(_ep_err);
 					endif ;
-					p_returnCode := 0;
+					_p_returnCode := 0;
 					errh::MarkAsHandled(_ep_err);
 				endblock ;
 				
-				return p_returnCode ;
+				return _p_returnCode ;
+			}
+			Comment: {
+				"The procedure liq::pr_GeoFindCoordinates can be used to find the latitude/longitude coordinates for a given address.
+				The procedure uses the LocationIQ geocoding service, see https://locationiq.com/"
 			}
 			StringParameter address {
 				Property: Input;
+				Comment: "A string representing the address for which the latitude and longitude coordinates have to be found.";
 			}
 			Parameter latitude {
 				Property: Output;
+				Comment: "A scalar numerical parameter that will contain the latitude coordinate of the specified address upon success.";
 			}
 			Parameter longitude {
 				Property: Output;
+				Comment: "A scalar numerical parameter that will contain the longitude coordinate of the specified address upon success.";
+			}
+			StringParameter email {
+				Property: Optional;
+				Comment: "Argument ignored, just provided for compatibility.";
+			}
+			StringParameter url {
+				Property: Optional;
+				Comment: "Argument ignored, just provided for compatibility.";
 			}
 			ElementParameter _ep_err {
 				Range: errh::PendingErrors;
 			}
-			Parameter p_returnCode;
+			Parameter _p_returnCode;
 		}
 		StringParameter sp_req_address;
 		ElementParameter _ep_statusCode {
@@ -84,40 +110,50 @@ LibraryModule LocationIQ {
 		Procedure pr_workGeoFindCoordinates {
 			Arguments: (address,latitude,longitude);
 			Body: {
+				! When doing multiple calls to a function, and just one, or a few, calls fail; 
+				! it helps to know which one; thus the address is cached for error reporting.
 				sp_req_address := address ; ! Used for error reporting.
 				
-				_s_ints := elementrange(1,1);
-				_sp_str('1') := sp_address ;
-				dex::client::QueryMapEncode(
-					queryMap    :  _sp_str, 
-					queryString :  _sp_query);
+				block ! Encode the arguments of this function, as they are used in the URL for the REST API call:
+					_s_ints := elementrange(1,1);
+					_sp_str('1') := sp_address ;
+					dex::client::QueryMapEncode(
+						queryMap    :  _sp_str, 
+						queryString :  _sp_query);
+				endblock ;
 				
-				_sp_reg := "eu1" ; ! Alternatives: eu1, us1.
-				_sp_url := 
-					formatString("https://%s.locationiq.com/v1/search?" , _sp_reg)+
-					formatSTring("key=%s&",sp_accessToken)+
-					formatString("q=%s&format=json&",_sp_query);
+				block ! Construct the URL to be used.
+					_sp_reg := "eu1" ; ! Alternatives: eu1, us1.
+					_sp_url := 
+						formatString("https://%s.locationiq.com/v1/search?" , _sp_reg)+
+						formatSTring("key=%s&",sp_accessToken)+
+						formatString("q=%s&format=json&",_sp_query);
+				endblock ;
 				
-				_sp_theRequest := "getLocation" ;
-				_ep_callback := 'liq::pr_workGeoFindCoordinatesCallback';
-				dex::client::NewRequest(
-					theRequest    :  _sp_theRequest, 
-					url           :  _sp_url, 
-					callback      :  _ep_callback, 
-					httpMethod    :  'GET', 
-					requestFile   :  "", 
-					responseFile  :  sp_libfolder + "/data/getLocation.json", 
-					traceFile     :  "", 
-					requestOffset :  0, 
-					requestSize   :  0);
-				dex::client::AddRequestTag(_sp_theRequest, _sp_theRequest);
-				dex::client::PerformRequest(_sp_theRequest);
+				block ! Construct the request to be made.
+					_sp_theRequest := "getLocation" ;
+					_ep_callback := 'liq::pr_workGeoFindCoordinatesCallback';
+					dex::client::NewRequest(
+						theRequest    :  _sp_theRequest, 
+						url           :  _sp_url, 
+						callback      :  _ep_callback, 
+						httpMethod    :  'GET', 
+						requestFile   :  "", 
+						responseFile  :  sp_libfolder + "/data/getLocation.json", 
+						traceFile     :  "", 
+						requestOffset :  0, 
+						requestSize   :  0);
+					dex::client::AddRequestTag(_sp_theRequest, _sp_theRequest); ! Add a tag to the request, such that the wait below doesn't return too early.
+				endblock ;
 				
-				if (not dex::client::WaitForResponses(5 * 1000,_sp_theRequest)) then
-					raise error "timeout" ;
-				endif ;
-				latitude  := p_globLat ;
-				longitude := p_globLon ;
+				block ! And finally perform the request and await its results.
+					dex::client::PerformRequest(_sp_theRequest);
+					if (not dex::client::WaitForResponses(5 * 1000,_sp_theRequest)) then
+						raise error "timeout" ;
+					endif ;
+					latitude  := p_globLat ;
+					longitude := p_globLon ;
+				endblock ;
 			}
 			StringParameter address {
 				Property: Input;
@@ -149,6 +185,7 @@ LibraryModule LocationIQ {
 			Body: {
 				if statusCode = 200 then
 				
+					! All ok, and the response file contains data that can be interpreted according to "Mappings/getLocationJSON.XML"
 					dex::ReadFromFile(
 						dataFile         :  sp_libfolder + "/data/getLocation.json", 
 						mappingName      :  "getLocationJSON", 
@@ -173,6 +210,7 @@ LibraryModule LocationIQ {
 						! Message from Server
 						_ep_statusCode := StringToElement(dex::HTTPStatusCodes, formatString("%i", statusCode),create:0);
 						if _ep_statusCode then
+							! Not ok, and the response file contains data that can be interpreted according to "Mappings/errorJSON.XML"
 							dex::ReadFromFile(
 								dataFile         :  sp_libfolder + "/data/getLocation.json", 
 								mappingName      :  "errorJSON", 
@@ -209,22 +247,33 @@ LibraryModule LocationIQ {
 			}
 			Procedure PostLibraryInitialization {
 				Body: {
-					sp_accessToken := sp_default_access_token ;
-					_sp_access_token_file := "..\\api-init\\LocationIQ.txt" ;
-					if FileExists( _sp_access_token_file ) then
-						read from file _sp_access_token_file ;
-					endif ;
-					DirectoryOfLibraryProject(
-						libraryname   :  "LocationIQ", 
-						directoryname :  sp_libfolder);
-					dex::ReadMappings(
-						startPath :  sp_libfolder, 
-						subFolder :  "", 
-						recursive :  1);
+					block ! Initialize the access token used, whereby the default access token is a question to provide one.
+						sp_accessToken := sp_default_access_token ;
+						! For testing purposes it is convenient to store your access token in a file next to your AIMMS project (but not in!)
+						_sp_access_token_file := "..\\api-init\\LocationIQ.txt" ;
+						if FileExists( _sp_access_token_file ) then
+							read from file _sp_access_token_file ;
+						endif ;
+					endblock ;
 					
-					webui::IdentifierElementText(IndexIdentifiers) :=$ data {
-						'liq::sp_accessToken' : "Your access token" 
-					} ;
+					block ! Ensure that additional files stored in the library can be accessed easily.
+						DirectoryOfLibraryProject(
+							libraryname   :  "LocationIQ", 
+							directoryname :  sp_libfolder);
+						dex::ReadMappings(
+							startPath :  sp_libfolder, 
+							subFolder :  "", 
+							recursive :  1);
+						if not  DirectoryExists( sp_libfolder + "/data" ) then
+							DirectoryCreate( sp_libfolder + "/data" );
+						endif ;
+					endblock ;
+					
+					block ! Provide end user friendly names for identifiers of this library used in the WebUI.
+						webui::IdentifierElementText(IndexIdentifiers) :=$ data {
+							'liq::sp_accessToken' : "Your access token" 
+						} ;
+					endblock ;
 				}
 				Comment: {
 					"Add initialization statements here that require another library to be initialized already,
