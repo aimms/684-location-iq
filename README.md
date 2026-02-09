@@ -1,32 +1,23 @@
-# Integrating LocationIQ with AIMMS
+# AIMMS How-To: LocationIQ Integration with AIMMS
 
-This AIMMS project illustrates the use of the LocationIQ AIMMS Library:
+![AIMMS Version](https://img.shields.io/badge/AIMMS-25.9-white?style=for-the-badge&labelColor=009B00&color=00D400)
+![WebUI Version](https://img.shields.io/badge/AIMMS-25.9.3.4-white?style=for-the-badge&labelColor=009B00&color=00D400)
+![DEX Version](https://img.shields.io/badge/AIMMS-26.1.7.1-white?style=for-the-badge&labelColor=009B00&color=00D400)
 
-1. It provides an alternative to the AIMMS function GeoFindCoordinates. The argument names are the same, and the return value is the same.
-    1. Copy the library to your own application.
-    2. Get an access token from [LocationIQ](https://locationiq.com/)
-    3. Replace calls to [GeoFindCoordinates](https://documentation.aimms.com/functionreference/system-interaction/environment-functions/geofindcoordinates.html) by calls to `liq::pr_GeoFindCoordinates`.
-2. It illustrates using [the AIMMS DEX client library](https://documentation.aimms.com/dataexchange/rest-client.html)
-   including its error handling.
+This repository contains the **minimal working example (MWE)** discussed in the following AIMMS How-To article:
 
-## Functions
+👉 **[Read the Full Article: LocationIQ Integration with AIMMS](https://how-to.aimms.com/Articles/684/684-LocationIQ.html)**
 
-### liq::pr_setAccessToken
+## 🚀 Getting Started
+1. **Download:** Download the project as a [.zip file](https://github.com/aimms/684-LocationIQ/archive/refs/heads/main.zip).
+2. **Open:** Launch the `.aimms` file.
+3. **Explore:** Open the **Model Explorer** (Ctrl+M) to examine the implementation logic described in the article.
 
-Arguments: 
+## 🤝 Support & Feedback
 
-- sp_newAccessToken: Input, String. The new access token to be used by `liq::pr_GeoFindCoordinates`
+This example is maintained by the **AIMMS User Support Team**.
+- Found an issue? [Open an issue](https://github.com/aimms/684-LocationIQ/issues).
+- Questions? Reach out via the [AIMMS Community](https://community.aimms.com).
 
-### liq::pr_GeoFindCoordinates
-
-Convert a physical address into geographic coordinates using LocationIQ.
-Returns 1 if the coordinates were successfully found, 0 if an error occurred.
-
-Arguments:
-
-- address: Input, String. A string representing the address for which the latitude and longitude coordinates have to be found.
-- Latitude: Output, Numeric. A scalar numerical parameter that will contain the latitude coordinate of the specified address upon success.
-- Longitude: Output, Numeric. A scalar numerical parameter that will contain the longitude coordinate of the specified address upon success.
-- e-mail: Optional, String. Argument ignored, just provided for compatibility.
-- url: Optional, String. Argument ignored, just provided for compatibility.
-
+---
+*Maintained by the AIMMS User Support Team. We optimize the way you build optimization.*
