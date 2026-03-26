@@ -1,8 +1,6 @@
 # AIMMS How-To: LocationIQ Integration with AIMMS
 
 ![AIMMS Version](https://img.shields.io/badge/AIMMS-25.9-white?style=for-the-badge&labelColor=009B00&color=00D400)
-![WebUI Version](https://img.shields.io/badge/AIMMS-25.9-white?style=for-the-badge&labelColor=009B00&color=00D400)
-![DEX Version](https://img.shields.io/badge/AIMMS-25.9-white?style=for-the-badge&labelColor=009B00&color=00D400)
 ![WebUI Version](https://img.shields.io/badge/WebUI-25.9.3.4-white?style=for-the-badge&labelColor=009B00&color=00D400)
 ![AimmsDEX Version](https://img.shields.io/badge/AimmsDEX-26.1.7.1-white?style=for-the-badge&labelColor=009B00&color=00D400)
 
